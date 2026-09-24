@@ -1,0 +1,2 @@
+@tailwind base;@tailwind components;@tailwind utilities;
+body{background:#f4f7f5;color:#15241b}input,textarea,select{outline:none}button{transition:all .15s}button:hover{filter:brightness(.96)}
