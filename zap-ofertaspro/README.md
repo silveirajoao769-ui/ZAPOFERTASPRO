@@ -1,27 +1,22 @@
-# ZAP OfertasPro — MVP gratuito
+# ZAP OfertasPro 1.2
 
-Aplicativo Next.js 14 + Tailwind CSS para organizar achadinhos e criar anúncios de afiliados.
+Next.js 14 + Supabase opcional. Produtos, anúncios e agenda funcionam localmente sem configuração.
 
-## Novidade da versão 1.1
-- Exportação completa de backup JSON
-- Restauração de backup com validação de formato e confirmação antes de substituir dados
-- Área de proteção de dados e próximas integrações
+## Rodar localmente
 
-## Funciona agora
-- Cadastro e exclusão de produtos, com links de afiliado
-- Textos editáveis para WhatsApp, Instagram e roteiros curtos de vídeo (templates, sem IA externa)
-- Compartilhamento manual via WhatsApp
-- Biblioteca de anúncios, agenda manual e vitrine local
-- Persistência no navegador com localStorage
+```bash
+npm install
+npm run dev
+```
 
-## Instalação
-1. Instale Node.js 20 ou superior.
-2. Execute `npm install` e `npm run dev`.
-3. Abra http://localhost:3000.
+## Ativar login e backup na nuvem
 
-## GitHub + Vercel
-1. Crie um repositório privado no GitHub e envie os arquivos desta pasta (sem `node_modules`).
-2. Na Vercel, clique em **Add New → Project**, importe o repositório e mantenha o framework Next.js.
-3. Clique em **Deploy**. Cada novo push no GitHub atualizará a versão publicada.
+1. Crie um projeto no Supabase e execute `supabase.sql` no SQL Editor.
+2. Copie `.env.example` para `.env.local` e preencha URL e **chave pública anon** de Project Settings > API. Nunca use service_role no frontend.
+3. Reinicie o servidor. Em Minha conta, cadastre-se e confirme seu e-mail se solicitado.
+4. Exporte um backup JSON antes da primeira sincronização. Use **Salvar dados na nuvem** para enviar dados locais ou **Restaurar dados da nuvem** para substituir dados locais, com confirmação. A sincronização é manual.
+5. Na Vercel, configure as duas variáveis de ambiente e redeploy. Em Supabase Authentication > URL Configuration, configure Site URL com o domínio Vercel e URLs de redirecionamento necessárias.
 
-**Atenção:** esta versão é uma demonstração pessoal, não um SaaS multiusuário. Os dados ficam apenas no navegador, não são sincronizados entre dispositivos e podem ser perdidos se o armazenamento for apagado. Não há login, pagamento, IA externa, rastreamento de vendas ou envio automático de mensagens. Antes de vender assinaturas, conectar Supabase com autenticação e regras RLS, backend de limites por plano e provedor de pagamentos. Confira os termos atuais da Vercel: o plano Hobby pode restringir uso comercial; para lançar um serviço pago, verifique um plano/host compatível.
+## Limitações
+
+Não há cobrança, IA externa, rastreamento de vendas, publicação automática ou vitrine pública. O backup remoto é um documento JSON por usuário, protegido por RLS. Se o Supabase não estiver configurado, o app permanece 100% local. Hospedagem comercial exige verificar os termos do plano contratado.
