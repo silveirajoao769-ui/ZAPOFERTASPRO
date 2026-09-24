@@ -2,6 +2,11 @@
 
 Aplicativo Next.js 14 + Tailwind CSS para organizar achadinhos e criar anúncios de afiliados.
 
+## Novidade da versão 1.1
+- Exportação completa de backup JSON
+- Restauração de backup com validação de formato e confirmação antes de substituir dados
+- Área de proteção de dados e próximas integrações
+
 ## Funciona agora
 - Cadastro e exclusão de produtos, com links de afiliado
 - Textos editáveis para WhatsApp, Instagram e roteiros curtos de vídeo (templates, sem IA externa)
