@@ -18,7 +18,9 @@ export async function POST(req:NextRequest){
   const origin=new URL(req.url).origin
   const res=await fetch('https://api.mercadopago.com/preapproval',{method:'POST',headers:{Authorization:'Bearer '+mp,'Content-Type':'application/json','X-Idempotency-Key':crypto.randomUUID()},body:JSON.stringify({reason:'ZAP OfertasPro '+(plan==='pro'?'Pro':'Premium'),external_reference:'zap:'+user.id+':'+plan,payer_email:user.email,auto_recurring:{frequency:1,frequency_type:'months',transaction_amount:prices[plan as keyof typeof prices],currency_id:'BRL'},back_url:origin+'/?billing=return',status:'pending'})})
   const result=await res.json()
-  if(!res.ok||!result.init_point)return NextResponse.json({error:'Não foi possível iniciar a assinatura. Tente novamente.'},{status:502})
-  return NextResponse.json({url:result.init_point})
+  if(!res.ok){const code=String(result?.error||'unknown').replace(/[^a-zA-Z0-9_-]/g,'').slice(0,45);const cause=String(result?.cause?.[0]?.code||'').replace(/[^a-zA-Z0-9_-]/g,'').slice(0,45);console.error('Mercado Pago preapproval rejected',{httpStatus:res.status,code,cause});const msg=res.status===401?'Credencial do Mercado Pago inválida ou incompatível. Confira o Access Token na Vercel.':res.status===403?'A conta Mercado Pago não autorizou a criação de assinaturas. Confira as permissões e o ambiente de teste.':res.status===400?'O Mercado Pago recusou os dados da assinatura. Consulte o código de diagnóstico.':'Mercado Pago indisponível. Tente novamente mais tarde.';return NextResponse.json({error:msg,diagnostic:code+(cause?'/'+cause:'')},{status:502})}
+  const checkoutUrl=result.sandbox_init_point&&mp.startsWith('TEST-')?result.sandbox_init_point:result.init_point
+  if(!checkoutUrl||!/^https:\/\//.test(checkoutUrl)){console.error('Mercado Pago preapproval missing checkout URL',{hasId:!!result.id,test:mp.startsWith('TEST-')});return NextResponse.json({error:'O Mercado Pago não retornou o link de pagamento.',diagnostic:'missing_checkout_url'},{status:502})}
+  return NextResponse.json({url:checkoutUrl})
  }catch{return NextResponse.json({error:'Erro ao iniciar pagamento.'},{status:500})}
 }
