@@ -7,7 +7,7 @@ export async function POST(req:NextRequest){
  let payload:any;try{payload=await req.json()}catch{return NextResponse.json({error:'Invalid payload'},{status:400})}
  const id=String(payload?.data?.id||'')
  const type=String(payload?.type||payload?.action||'')
- if(!/^\\d{1,30}$/.test(id)||!(/subscription_preapproval|preapproval/.test(type)))return NextResponse.json({ok:true})
+ if(!/^\d{1,30}$/.test(id)||!(/subscription_preapproval|preapproval/.test(type)))return NextResponse.json({ok:true})
  const response=await fetch('https://api.mercadopago.com/preapproval/'+id,{headers:{Authorization:'Bearer '+secret},cache:'no-store'})
  if(!response.ok)return NextResponse.json({error:'Provider unavailable'},{status:502})
  const item=await response.json()
