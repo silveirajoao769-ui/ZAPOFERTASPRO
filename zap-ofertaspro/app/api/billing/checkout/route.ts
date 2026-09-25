@@ -4,7 +4,7 @@ export const runtime='nodejs'
 const prices={pro:29.90,premium:59.90} as const
 export async function POST(req:NextRequest){
  try{
-  const token=req.headers.get('authorization')?.replace(/^Bearer\\s+/i,'')
+  const token=req.headers.get('authorization')?.replace(/^Bearer\s+/i,'')
   const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,mp=process.env.MERCADOPAGO_ACCESS_TOKEN
   if(!token)return NextResponse.json({error:'Entre na sua conta.'},{status:401})
   if(!url||!key||!mp)return NextResponse.json({error:'Pagamentos ainda não configurados. Entre em contato com o suporte.'},{status:503})
