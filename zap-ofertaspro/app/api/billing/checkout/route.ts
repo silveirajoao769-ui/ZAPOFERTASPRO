@@ -26,8 +26,10 @@ export async function POST(req:NextRequest){
   const service=process.env.SUPABASE_SERVICE_ROLE_KEY
   if(!service)return NextResponse.json({error:'Não foi possível registrar a assinatura. Entre em contato com o suporte.'},{status:503})
   const admin=createClient(url,service,{auth:{persistSession:false,autoRefreshToken:false}})
+  const {data:verified,error:adminError}=await admin.auth.admin.getUserById(user.id)
+  if(adminError||!verified.user){console.error('Supabase service role verification failed',{code:adminError?.code,status:adminError?.status});return NextResponse.json({error:'Falha na configuração do acesso ao banco. Confira SUPABASE_SERVICE_ROLE_KEY na Vercel.'},{status:503})}
   const {data:saved,error:saveError}=await admin.from('subscriptions').update({mp_preapproval_id:result.id,updated_at:new Date().toISOString()}).eq('user_id',user.id).neq('subscription_status','active').select('user_id').maybeSingle()
-  if(saveError||!saved){console.error('Unable to bind Mercado Pago subscription',{userId:user.id,hasProviderId:true,code:saveError?.code});return NextResponse.json({error:'Não foi possível registrar a assinatura. Tente novamente ou contate o suporte.'},{status:502})}
+  if(saveError||!saved){console.error('Unable to bind Mercado Pago subscription',{userId:user.id,hasProviderId:true,code:saveError?.code,message:saveError?.message,details:saveError?.details});return NextResponse.json({error:'Não foi possível registrar a assinatura no banco. Entre em contato com o suporte antes de tentar novamente.'},{status:502})}
   return NextResponse.json({url:checkoutUrl})
  }catch{return NextResponse.json({error:'Erro ao iniciar pagamento.'},{status:500})}
 }
