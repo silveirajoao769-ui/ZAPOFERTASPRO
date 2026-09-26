@@ -28,8 +28,10 @@ export async function POST(req:NextRequest){
  const admin=createClient(url,service,{auth:{persistSession:false,autoRefreshToken:false}})
  const {data:{user},error:userError}=await admin.auth.admin.getUserById(match[1])
  if(userError||!user?.email||user.email.toLowerCase()!==String(item.payer_email||'').toLowerCase())return NextResponse.json({error:'Payer mismatch'},{status:403})
- const {data:record,error}=await admin.from('subscriptions').select('user_id,plan,subscription_status').eq('user_id',match[1]).maybeSingle()
+ const {data:record,error}=await admin.from('subscriptions').select('user_id,plan,subscription_status,mp_preapproval_id').eq('user_id',match[1]).maybeSingle()
  if(error||!record)return NextResponse.json({error:'Subscription missing'},{status:500})
+ // Ignore notifications for abandoned or superseded checkouts; never activate another subscription.
+ if(record.mp_preapproval_id!==String(item.id||''))return NextResponse.json({ok:true,ignored:'subscription_not_current'})
  const status=String(item.status||'')
  if(status==='authorized'){
   const {error:write}=await admin.from('subscriptions').update({plan:match[2],subscription_status:'active',updated_at:new Date().toISOString()}).eq('user_id',match[1])
